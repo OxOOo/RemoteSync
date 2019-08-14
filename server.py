@@ -2,7 +2,7 @@
 
 import os, sys, time
 import common
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, jsonify
 
 """
 usage: path
@@ -26,7 +26,7 @@ def gettime():
 @app.route('/walk')
 def walk():
     data = common.walk(WORK_DIR)
-    return data
+    return jsonify(data)
 
 @app.route('/download/<path:path>')
 def download(path):
