@@ -3,6 +3,18 @@ import hashlib
 
 CONFIG_FILE = '.sync'
 
+global ginfo
+ginfo = {}
+def getinfo(filepath):
+    global ginfo
+    filepath = os.path.abspath(filepath)
+    if filepath not in ginfo or ginfo[filepath]['last_modified'] != os.path.getmtime(filepath):
+        ginfo[filepath] = {
+            'md5': hashlib.md5(open(filepath, 'rb').read()).hexdigest(),
+            'last_modified': os.path.getmtime(filepath)
+        }
+    return ginfo[filepath]
+
 def walk(work_dir):
     work_dir = os.path.join(work_dir, './')
     if os.path.exists(os.path.join(work_dir, CONFIG_FILE)):
@@ -21,10 +33,7 @@ def walk(work_dir):
             if item in notfiles: continue
             if not os.path.isfile(item): continue
             assert work_dir in item
-            data[item.replace(work_dir, '')] = {
-                'md5': hashlib.md5(open(item, 'rb').read()).hexdigest(),
-                'last_modified': os.path.getmtime(item)
-            }
+            data[item.replace(work_dir, '')] = getinfo(item)
         return data
     else:
         return {}
